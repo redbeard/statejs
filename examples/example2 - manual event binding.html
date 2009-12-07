@@ -3,6 +3,22 @@
 <script type="text/javascript" src="../lib/jquery-1.3.2.js" ></script>
 <script type="text/javascript" src="../lib/jquery.timers-1.2.js" ></script>
 	<script type="text/javascript" src="../lib/state.js" ></script>
+
+</head>
+<body>
+	<span id="switch">
+		<img name="on" border="0" style="height: 48px; display: none;" src="images/light_switch_on.jpg" />
+		<img name="off" border="0" style="height: 48px; display: none;"  src="images/light_switch_off.jpg" />
+	</span>
+	<span id="power_led">
+		<img name="on" style="width: 24px; height: 24px; display: none;" src="images/led_circle_red_med.png" />
+		<img name="off" style="width: 24px; height: 24px; display: none;" src="images/led_circle_grey_med.png" />
+	</span>
+	<span id="blinking_led">
+		<img name="on" style="width: 24px; height: 24px; display: none;" src="images/led_circle_green_med.png" />
+		<img name="off" style="width: 24px; height: 24px; display: none;" src="images/led_circle_grey_med.png" />
+	</span>
+</body>
 	<script type="text/javascript">
 	var root = state({
 		name: "Root",
@@ -10,58 +26,78 @@
 			initial: state({ 
 				name: "On",
 				entry: function() { 
-					$("#power_led").fadeIn();
-					$('#switch').live("click", function() { 
-					root.subs.initial.transitionTo(root.subs.off); 
-				}); },
+					switch_behaviour.on();
+					power_led_behaviour.on();
+					
+					// Manually bind to click: transition -> off
+					$('#switch').live("click", function() { root.subs.initial.transitionTo(root.subs.off); }); 
+				},
 				exit: function() { 
-					$("#power_led").fadeOut();
+					power_led_behaviour.off();
 					$("#switch").die("click"); 
 				},
 				subs: {
 					initial: state({
 						name: "blink_on",
 						entry: function() { 
-							$("#blinking_led").fadeIn("fast");
-							$(this).oneTime(200, function() { root.subs.initial.subs.initial.transitionTo(root.subs.initial.subs.blink_off); } );
+							blinking_led_behaviour.on();
+							$(this).oneTime(200, function() { this.root().currentState().transitionTo(root.subs.initial.subs.blink_off); } );
 						},
 						exit: function() {
-							$("#blinking_led").fadeOut("fast");
+							$(this).stopTime();
+							blinking_led_behaviour.off();
 						}
 					}),
 					blink_off: state({
 						entry: function() { 
-							$(this).oneTime(200, function() { root.subs.initial.subs.blink_off.transitionTo(root.subs.initial.subs.initial); } );
+							$(this).oneTime(200, function() { this.root().currentState().transitionTo(root.subs.initial.subs.initial); } );
 						},
 						
 					})
 				} }),
 			off: state({
 				entry: function() {
-					$('#switch').live("click", function() { 
-						root.subs.off.transitionTo(root.subs.initial); 
-					}); 
+					switch_behaviour.off();
+					
+					// Manually bind to click: transition -> on
+					$('#switch').live("click", function() { root.subs.off.transitionTo(root.subs.initial); }); 
 				},
-				exit: function() { $("#switch").die("click"); },
+				exit: function() { 
+					$("#switch").die("click"); 
+				},
 			}),
 		}
 	});
 
-	root.start();
+	ToggleBehaviour = function(props) { return $.extend(state({
+		name: "led",
+		subs: {
+			initial: state({ 
+				name: "off",
+				entry: function() { this.root().off_image().show(); },
+				exit: function() { this.root().off_image().hide(); }
+			}),
+			on: state({
+				entry: function() { this.root().on_image().show(); },
+				exit: function(){ this.root().on_image().hide(); }
+			})
+		},
+		
+		on_image: function() { return $("img[name='on']", $(this.root().data) ); }, 
+		off_image: function() { return $("img[name='off']", $(this.root().data) ); }, 
+		
+		on: function() { this.currentState().transitionTo(this.root().locate("on")); },
+		off: function() { this.currentState().transitionTo(this.root().locate("off")); }
+	}), props) };
 	
-//	root.currentState().transitionTo(root.subs.off);
+	var power_led_behaviour = new ToggleBehaviour({ name: "Power Led", data: $("#power_led") });
+	var blinking_led_behaviour = new ToggleBehaviour({ name: "Blinking Led", data: $("#blinking_led") });
+	var switch_behaviour = new ToggleBehaviour({ name: "Switch", data: $("#switch") });
 
+	power_led_behaviour.start();
+	blinking_led_behaviour.start();
+	switch_behaviour.start();
+	
+	root.start();
 </script>
-</head>
-<body>
-	<a id="switch" href="#">
-		Switch
-	</a>
-	<div id="power_led">
-		Power Led
-	</div>
-	<div id="blinking_led">
-		Blinking Led
-	</div>
-</body>
 </html>
