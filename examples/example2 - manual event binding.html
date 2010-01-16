@@ -30,11 +30,14 @@
 					power_led_behaviour.on();
 					
 					// Manually bind to click: transition -> off
-					$('#switch').live("click", function() { root.subs.initial.transitionTo(root.subs.off); }); 
+					$(this).log("Binding to mouse up in state " + this.fullName());
+					$('#switch').bind("mouseup", function() { root.subs.initial.transitionTo(root.subs.off); return false; }); 
 				},
 				exit: function() { 
 					power_led_behaviour.off();
-					$("#switch").die("click"); 
+					
+					$(this).log("Unbinding from mouse up in state " + this.fullName());
+					$("#switch").unbind("mouseup"); 
 				},
 				subs: {
 					initial: state({
@@ -60,10 +63,12 @@
 					switch_behaviour.off();
 					
 					// Manually bind to click: transition -> on
-					$('#switch').live("click", function() { root.subs.off.transitionTo(root.subs.initial); }); 
+					$(this).log("Binding to mouse up in state " + this.fullName());
+					$('#switch').bind("mouseup", function() { root.subs.off.transitionTo(root.subs.initial); return false; }); 
 				},
 				exit: function() { 
-					$("#switch").die("click"); 
+					$(this).log("Unbinding from mouse up in state " + this.fullName());
+					$("#switch").unbind("mouseup"); 
 				},
 			}),
 		}
