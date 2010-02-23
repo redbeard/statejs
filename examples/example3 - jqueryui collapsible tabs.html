@@ -7,6 +7,7 @@
         <script type="text/javascript" src="../lib/ui/jquery.ui.core.js"></script>
         <script type="text/javascript" src="../lib/ui/jquery.ui.widget.js"></script>
         <script type="text/javascript" src="../lib/ui/jquery.ui.tabs.js"></script>
+        <script type="text/javascript" src="../lib/anchor.js" ></script>
         <script type="text/javascript" src="../lib/state.js" ></script>
         <link type="text/css" href="stylesheets/jquery-demos.css" rel="stylesheet" />
         <script type="text/javascript">
@@ -14,6 +15,7 @@
                 $("#tabs1").tabs({
                     collapsible: true
                 });
+                
                 $("#tabs2").tabs({
                     collapsible: true
                 });
@@ -73,7 +75,7 @@
 
         <script type="text/javascript">
             var TabsBehaviour = function(props) { return $.extend(state({
-                entry: function() {
+                entry: function() {                    
                     $(this.divId).bind('tabsselect', this, this.bind);
                 },
                 bind: function(event, ui) {
