@@ -40,6 +40,20 @@ Screw.Unit(function() {
                     anchor.set.apply(mockedAnchor, [ { root: "state1/state2", tabs1: "state1/state2"} ]);
                 });
             });
+
+            describe('with a root and a named hash with an empty state', function() {
+                it('should set an anchor with just the root state', function() {
+                    given.mockedAnchor.should("_setRawAnchor").using("state1/state2");
+                    anchor.set.apply(mockedAnchor, [ { root: "state1/state2", tabs1: ""} ]);
+                });
+            });
+
+            describe('with an empty root and a named hash with an empty state', function() {
+                it('should set an anchor with just the root state', function() {
+                    given.mockedAnchor.should("_setRawAnchor").using("");
+                    anchor.set.apply(mockedAnchor, [ { root: null, tabs1: ""} ]);
+                });
+            });
         });
 
         describe('#get', function() {
