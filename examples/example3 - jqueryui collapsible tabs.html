@@ -7,7 +7,7 @@
         <script type="text/javascript" src="../lib/ui/jquery.ui.core.js"></script>
         <script type="text/javascript" src="../lib/ui/jquery.ui.widget.js"></script>
         <script type="text/javascript" src="../lib/ui/jquery.ui.tabs.js"></script>
-        <script type="text/javascript" src="../lib/anchor.js" ></script>
+        <script type="text/javascript" src="../lib/jquery.ba-bbq.js" ></script>
         <script type="text/javascript" src="../lib/state.js" ></script>
         <link type="text/css" href="stylesheets/jquery-demos.css" rel="stylesheet" />
         <script type="text/javascript">
@@ -22,7 +22,7 @@
             });
         </script>
     </head>
-    <body onload='tabs1.start(); tabs2.start();'>
+    <body onload='tabs1.load(); tabs2.load();'>
 
         <div class="demo">
 
@@ -74,27 +74,27 @@
         </div><!-- End demo-description -->
 
         <script type="text/javascript">
-            var TabsBehaviour = function(props) { return $.extend(state({
+        var TabsBehaviour = function(props) { return $.extend(state({
                 entry: function() {                    
                     $(this.divId).bind('tabsselect', this, this.bind);
                 },
                 bind: function(event, ui) {
-                        var stateRoot = event.data;
-                        var targetStateName = "tab" + (ui.index+1);
-                        var targetState = stateRoot.locate(targetStateName);
+                    var stateRoot = event.data;
+                    var targetStateName = "tab" + (ui.index+1);
+                    var targetState = stateRoot.locate(targetStateName);
 
-                        if (targetState.active) {
-                            var collapsedTargetState = targetState.locate("collapsed");
-                            var expandedTargetState = targetState.locate("expanded");
+                    if (targetState.active) {
+                        var collapsedTargetState = targetState.locate("collapsed");
+                        var expandedTargetState = targetState.locate("expanded");
 
-                            targetState = collapsedTargetState;
-                            if (collapsedTargetState.active) {
-                                targetState = expandedTargetState;
-                            }
+                        targetState = collapsedTargetState;
+                        if (collapsedTargetState.active) {
+                            targetState = expandedTargetState;
                         }
+                    }
                         
-                        stateRoot.currentState().safeTransitionTo(targetState);
-                    },
+                    stateRoot.currentState().safeTransitionTo(targetState);
+                },
                 subs: {
                     initial: state({
                         name: "tab1",
@@ -118,8 +118,8 @@
                 }
             }), props) };
 
-            var tabs1 = new TabsBehaviour({ name: "Tabs1", divId: '#tabs1' })
-            var tabs2 = new TabsBehaviour({ name: "Tabs2", divId: '#tabs2' })
+        var tabs1 = new TabsBehaviour({ name: "Tabs1", divId: '#tabs1' })
+        var tabs2 = new TabsBehaviour({ name: "Tabs2", divId: '#tabs2' })
         </script>
     </body>
 </html>
