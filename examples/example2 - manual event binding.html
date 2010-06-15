@@ -22,10 +22,10 @@
     </body>
     <script type="text/javascript">
         var root = state({
-            name: "Root",
+            name: "system",
             subs: {
                 initial: state({
-                    name: "On",
+                    name: "on",
                     entry: function() {
                         switch_behaviour.on();
                         power_led_behaviour.on();
@@ -43,7 +43,6 @@
                     subs: {
                         initial: state({
                             name: "blink_on",
-                            doNotPersist: true, 
                             entry: function() {
                                 blinking_led_behaviour.on();
                                 $(this).oneTime(200, function() { this.root().currentState().transitionTo(root.subs.initial.subs.blink_off); } );
@@ -54,7 +53,6 @@
                             }
                         }),
                         blink_off: state({
-                            doNotPersist: true,
                             entry: function() {
                                 $(this).oneTime(200, function() { this.root().currentState().transitionTo(root.subs.initial.subs.initial); } );
                             }
@@ -64,7 +62,6 @@
                 off: state({
                     entry: function() {
                         switch_behaviour.off();
-					
                         // Manually bind to click: transition -> on
                         $(this).log("Binding to mouse up in state " + this.fullName());
                         $('#switch').bind("mouseup", function() { root.subs.off.transitionTo(root.subs.initial); return false; });
@@ -72,22 +69,21 @@
                     exit: function() {
                         $(this).log("Unbinding from mouse up in state " + this.fullName());
                         $("#switch").unbind("mouseup");
-                    },
-                }),
+                    }
+                })
             }
         });
 
         ToggleBehaviour = function(props) { return $.extend(state({
                 name: "led",
+                doNotPersist: true,
                 subs: {
                     initial: state({
                         name: "off",
-                        doNotPersist: true,
                         entry: function() { this.root().off_image().show(); },
                         exit: function() { this.root().off_image().hide(); }
                     }),
                     on: state({
-                        doNotPersist: true,
                         entry: function() { this.root().on_image().show(); },
                         exit: function(){ this.root().on_image().hide(); }
                     })

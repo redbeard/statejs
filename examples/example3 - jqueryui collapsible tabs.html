@@ -74,52 +74,78 @@
         </div><!-- End demo-description -->
 
         <script type="text/javascript">
-        var TabsBehaviour = function(props) { return $.extend(state({
-                entry: function() {                    
-                    $(this.divId).bind('tabsselect', this, this.bind);
-                },
-                bind: function(event, ui) {
-                    var stateRoot = event.data;
-                    var targetStateName = "tab" + (ui.index+1);
-                    var targetState = stateRoot.locate(targetStateName);
-
-                    if (targetState.active) {
-                        var collapsedTargetState = targetState.locate("collapsed");
-                        var expandedTargetState = targetState.locate("expanded");
-
-                        targetState = collapsedTargetState;
-                        if (collapsedTargetState.active) {
-                            targetState = expandedTargetState;
+            var TabsBehaviour = function(props) { return $.extend(state({
+                    entry: function() {
+                        $(this.divId).bind('tabsselect', this, this.bind);
+                    },
+                    bind: function(event, ui) {
+                        var stateRoot = event.data;
+                        if (stateRoot.ignore)
+                        {
+                            return;
                         }
-                    }
                         
-                    stateRoot.currentState().safeTransitionTo(targetState);
-                },
-                subs: {
-                    initial: state({
-                        name: "tab1",
-                        subs: {
-                            initial: state({ name: 'expanded' }),
-                            collapsed: state()
-                        }
-                    }),
-                    tab2: state({
-                        subs: {
-                            initial: state({ name: 'expanded' }),
-                            collapsed: state()
-                        }
-                    }),
-                    tab3: state({
-                        subs: {
-                            initial: state({ name: 'expanded' }),
-                            collapsed: state()
-                        }
-                    })
-                }
-            }), props) };
+                        var targetStateName = "tab" + (ui.index+1);
+                        var targetState = stateRoot.locate(targetStateName);
 
-        var tabs1 = new TabsBehaviour({ name: "Tabs1", divId: '#tabs1' })
-        var tabs2 = new TabsBehaviour({ name: "Tabs2", divId: '#tabs2' })
+                        if (targetState.active) {
+                            var collapsedTargetState = targetState.locate("collapsed");
+                            var expandedTargetState = targetState.locate("expanded");
+
+                            targetState = collapsedTargetState;
+                            if (collapsedTargetState.active) {
+                                targetState = expandedTargetState;
+                            }
+                        }
+                        
+                        stateRoot.currentState().safeTransitionTo(targetState);
+                    },
+
+                    handleRestoreSelect: function(whichTab) {
+                        if (this.root().isRestoring()) {
+                            this.root().ignore = true;
+                            $(this.root().divId).tabs("select", whichTab);
+                            this.root().ignore = false;
+                        }
+                    },
+
+                    subs: {
+                        initial: state({
+                            name: "tab1",
+                            subs: {
+                                initial: state({ name: 'expanded' }),
+                                collapsed: state({
+                                    entry: function() { this.root().handleRestoreSelect(0) },
+                                    exit: function() { this.root().handleRestoreSelect(0) }
+                                })
+                            },
+                            entry: function() { this.root().handleRestoreSelect(0) }
+                        }),
+                        tab2: state({
+                            subs: {
+                                initial: state({ name: 'expanded' }),
+                                collapsed: state({
+                                    entry: function() { this.root().handleRestoreSelect(1) },
+                                    exit: function() { this.root().handleRestoreSelect(1) }
+                                })
+                            },
+                            entry: function() { this.root().handleRestoreSelect(1) }
+                        }),
+                        tab3: state({
+                            subs: {
+                                initial: state({ name: 'expanded' }),
+                                collapsed: state({
+                                    entry: function() { this.root().handleRestoreSelect(2) },
+                                    exit: function() { this.root().handleRestoreSelect(2) }
+                                })
+                            },
+                            entry: function() { this.root().handleRestoreSelect(2) }
+                        })
+                    }
+                }), props) };
+
+            var tabs1 = new TabsBehaviour({ name: "Tabs1", divId: '#tabs1' })
+            var tabs2 = new TabsBehaviour({ name: "Tabs2", divId: '#tabs2' })
         </script>
     </body>
 </html>
