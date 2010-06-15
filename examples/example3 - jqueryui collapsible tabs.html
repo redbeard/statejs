@@ -22,7 +22,7 @@
             });
         </script>
     </head>
-    <body onload='tabs1.load(); tabs2.load();'>
+    <body onload='historyManager.push(); tabs1.load(); tabs2.load(); historyManager.pop();'>
 
         <div class="demo">
 
@@ -78,6 +78,7 @@
                     entry: function() {
                         $(this.divId).bind('tabsselect', this, this.bind);
                     },
+                    
                     bind: function(event, ui) {
                         var stateRoot = event.data;
                         if (stateRoot.ignore)
